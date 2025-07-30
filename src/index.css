@@ -9,8 +9,6 @@ body {
     color: #D9D9D9;
     padding: 20px;
     height: 100vh;
-    display: flex;
-    justify-content: center;
 }
 
 main {
@@ -36,20 +34,38 @@ header > p {
 }
 
 section.game-status {
-    
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     color: #F9F4DA;
-    border-radius: 4px;
-    margin-block: 30px;
-    min-height: 80px;
     width: 100%;
     max-width: 350px;
+    min-height: 60px;
+    border-radius: 4px;
+    margin-block: 30px;
+}
+
+section.game-status.won {
+    background-color: #10A95B;
+}
+
+section.game-status.lost {
+    background-color: #BA2A2A;
+}
+
+.game-status.farewell {
+    background-color: #7A5EA7;
+    border: 1px dashed #323232;
 }
 
 section.game-status > p {
     margin: 5px;
+}
+
+section.game-status > p.farewell-message {
+    font-style: italic;
+    font-weight: 400;
 }
 
 section.game-status > h2 {
@@ -130,13 +146,6 @@ section.keyboard > button.correct {
 section.keyboard > button.wrong {
     background-color: #EC5D49;
 }
-.correct {
-    background-color: #10A95B;
-}
-
-.wrong {
-    background-color: #EC5D49;
-}
 
 button.new-game {
     background-color: #11B5E5;
@@ -148,4 +157,15 @@ button.new-game {
     display: block;
     margin-inline: auto;
     cursor: pointer;
+}
+.correct {
+    background-color: #10A95B;
+}
+
+.wrong {
+    background-color: #EC5D49;
+}
+
+.missedLetters{
+    color: red;
 }

@@ -1,23 +1,33 @@
 import React from "react"
 import {languages} from "./languages"
+import {getFarewellText} from "./utils"
+import {words} from "./words"
 import clsx from 'clsx';
+import Confetti from "react-confetti"
 function App() {
-  const [currentWord , setCurrentWord] = React.useState("react")
+  const [currentWord , setCurrentWord] = React.useState(randomWord())
   const [guessedLetters,setGuessedLetters]=React.useState([])
   const [wrongGuesses , setWrongGuesses] = React.useState(0)
+  const [lastGuessed , setLastGuessed] = React.useState(null)
   const isGameLost= wrongGuesses>=8
   const isGameWon = currentWord.toUpperCase().split("").every((letter)=>{
     return guessedLetters.includes(letter)
   })
-  console.log(wrongGuesses);
+  
+  function randomWord(){
+    const index = Math.floor(Math.random()*words.length)
+    return(
+      words[index]
+    )
+  }
   
   
-  
-  const isGameOver= isGameLost || isGameWon
+ let isGameOver= isGameLost || isGameWon
   
   const sectionBg = clsx("game-status",{
     correct:isGameWon,
-    wrong:isGameLost
+    wrong:isGameLost,
+    farewell:!isGameOver && wrongGuesses>0 && lastGuessed && !currentWord.toUpperCase().includes(lastGuessed)
   })
   const codeLanguages = languages.map((language,index)=>{
     const lostLanguage = clsx("chip",{
@@ -39,10 +49,20 @@ function App() {
     )
   })
 
+  const lostWordDisplay = letters.map((letter,index)=>{
+    const className = clsx({
+      missedLetters: isGameOver&& !guessedLetters.includes(letter)
+    })
+    return(
+      <span key={index} className={className}>{letter}</span>
+    )
+  })
+
   function handleClick(key){
     if(guessedLetters.includes(key)){
       return;
     }
+    setLastGuessed(key)
     setGuessedLetters((prevGuessed)=>{
       return(prevGuessed.includes(key) ? prevGuessed:[...prevGuessed , key])
     })
@@ -68,12 +88,24 @@ function App() {
             
         })
     
-    return <button className={className} key={key} onClick={()=>{handleClick(key)}}>{key}</button>
+    return <button disabled={isGameOver} className={className} key={key} onClick={()=>{handleClick(key)}}>{key}</button>
   })
 
   function renderGameStatus() {
+    
         if (!isGameOver) {
+          const lastWrong = lastGuessed&& !currentWord.toUpperCase().includes(lastGuessed)
+          if(wrongGuesses>0 && lastWrong){
+            
+            const name = languages[wrongGuesses-1]
+            console.log(name.name)
+            return(
+              <p  className="farewell-message">{getFarewellText(name.name)}</p>
+            )
+          }
+         
             return null
+        
         }
 
         if (isGameWon) {
@@ -92,13 +124,20 @@ function App() {
             )
         }
     }
+    
+    function reset(){
+      setCurrentWord(randomWord())
+      setGuessedLetters([])
+      setLastGuessed(null)
+      setWrongGuesses(0)
 
-
+    }
 
 
   return(
     <main>
       <header>
+        {isGameWon&& <Confetti/>}
       <h1>Assembly: Endgame</h1>
       <p>Guess the word in under 8 attempts to keep the programming world safe from Assembly</p>
       </header>
@@ -114,12 +153,12 @@ function App() {
         {codeLanguages}
       </section>
       <section className="word">
-        {wordDis}
+        {isGameLost?lostWordDisplay:wordDis}
       </section>
       <section className="keyboard">
         {keyboardElements}
       </section>
-      {isGameOver&&<button className="new-game">New Game</button>}
+      {isGameOver&&<button className="new-game" onClick={reset}>New Game</button>}
     </main>
   )
 }
